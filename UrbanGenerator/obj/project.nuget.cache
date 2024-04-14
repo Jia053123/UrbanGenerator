@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZlHRfMkQ75YKRNCHcryKLizgrjlFGmhg+R6cEk0+ZKxuryo6Qh7W/DrQkA7cDNs1lAlxgKjmYJskA74V1FbhXQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Eppy\\Documents\\MyCode\\UrbanGenerator\\UrbanGenerator\\UrbanGenerator.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Eppy\\.nuget\\packages\\grasshopper\\7.13.21348.13001\\grasshopper.7.13.21348.13001.nupkg.sha512",
+    "C:\\Users\\Eppy\\.nuget\\packages\\rhinocommon\\7.13.21348.13001\\rhinocommon.7.13.21348.13001.nupkg.sha512"
+  ],
+  "logs": []
+}

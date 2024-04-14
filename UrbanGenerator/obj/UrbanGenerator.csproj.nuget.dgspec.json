@@ -1,0 +1,58 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Eppy\\Documents\\MyCode\\UrbanGenerator\\UrbanGenerator\\UrbanGenerator.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Eppy\\Documents\\MyCode\\UrbanGenerator\\UrbanGenerator\\UrbanGenerator.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Eppy\\Documents\\MyCode\\UrbanGenerator\\UrbanGenerator\\UrbanGenerator.csproj",
+        "projectName": "UrbanGenerator",
+        "projectPath": "C:\\Users\\Eppy\\Documents\\MyCode\\UrbanGenerator\\UrbanGenerator\\UrbanGenerator.csproj",
+        "packagesPath": "C:\\Users\\Eppy\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Eppy\\Documents\\MyCode\\UrbanGenerator\\UrbanGenerator\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Eppy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net48"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net48": {
+            "targetAlias": "net48",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "dependencies": {
+            "Grasshopper": {
+              "include": "Compile, Build",
+              "target": "Package",
+              "version": "[7.13.21348.13001, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.414\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
