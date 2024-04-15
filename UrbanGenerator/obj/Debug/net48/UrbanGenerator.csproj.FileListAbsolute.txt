@@ -7,3 +7,12 @@ C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\UrbanGenerator\obj\
 C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.csproj.CoreCompileInputs.cache
 C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.gha
 C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.pdb
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.AssemblyInfoInputs.cache
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.AssemblyInfo.cs
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.csproj.CoreCompileInputs.cache
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\bin\Debug\net48\UrbanGenerator.gha
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\bin\Debug\net48\UrbanGenerator.pdb
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.gha
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.pdb
+C:\Users\Eppy\Documents\MyCode\UrbanGenerator\UrbanGenerator\obj\Debug\net48\UrbanGenerator.csproj.AssemblyReference.cache

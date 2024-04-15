@@ -28,19 +28,7 @@ namespace UrbanGenerator
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            // Use the pManager object to register your input parameters.
-            // You can often supply default values when creating parameters.
-            // All parameters must have the correct access type. If you want 
-            // to import lists or trees of values, modify the ParamAccess flag.
-            pManager.AddPathParameter("ModelDirectory", "Dir", "folder containing the ResStock models", GH_ParamAccess.item);
-            //pManager.AddPlaneParameter("Plane", "P", "Base plane for spiral", GH_ParamAccess.item, Plane.WorldXY);
-            //pManager.AddNumberParameter("Inner Radius", "R0", "Inner radius for spiral", GH_ParamAccess.item, 1.0);
-            //pManager.AddNumberParameter("Outer Radius", "R1", "Outer radius for spiral", GH_ParamAccess.item, 10.0);
-            //pManager.AddIntegerParameter("Turns", "T", "Number of turns between radii", GH_ParamAccess.item, 10);
-
-            // If you want to change properties of certain parameters, 
-            // you can use the pManager instance to access them by index:
-            //pManager[0].Optional = true;
+            pManager.AddTextParameter("ModelDirectory", "Dir", "folder containing the ResStock models", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -48,14 +36,9 @@ namespace UrbanGenerator
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            // Use the pManager object to register your output parameters.
-            // Output parameters do not have default values, but they too must have the correct access type.
-            //pManager.AddCurveParameter("Spiral", "S", "Spiral curve", GH_ParamAccess.item);
             pManager.AddBrepParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
-
-            // Sometimes you want to hide a specific parameter from the Rhino preview.
-            // You can use the HideParameter() method as a quick way:
-            //pManager.HideParameter(0);
+            pManager.AddTextParameter("debug", "d", "debug message", GH_ParamAccess.item);
+            //pManager.AddBrepParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -65,64 +48,18 @@ namespace UrbanGenerator
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string path = null;
+            string modelsDir = null;
+            if (!DA.GetData(0, ref modelsDir)) return;
+            //Console.WriteLine(path);
 
-            // Then we need to access the input parameters individually. 
-            // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref path)) return;
-            //if (!DA.GetData(1, ref radius0)) return;
-            //if (!DA.GetData(2, ref radius1)) return;
-            //if (!DA.GetData(3, ref turns)) return;
+            string modelDir = Directory.GetDirectories(modelsDir)[0];
+            string pathToModel = Directory.GetFiles(modelDir, "*.xml")[0];
 
-            // We should now validate the data and warn the user if invalid data is supplied.
-            //if (radius0 < 0.0)
-            //{
-            //    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Inner radius must be bigger than or equal to zero");
-            //    return;
-            //}
-            //if (radius1 <= radius0)
-            //{
-            //    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Outer radius must be bigger than the inner radius");
-            //    return;
-            //}
-            //if (turns <= 0)
-            //{
-            //    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Spiral turn count must be bigger than or equal to one");
-            //    return;
-            //}
+            ModelParser modelParser = new ModelParser(pathToModel);
+            var walls = modelParser.Walls;
 
-            //// We're set to create the spiral now. To keep the size of the SolveInstance() method small, 
-            //// The actual functionality will be in a different method:
-            //Curve spiral = CreateSpiral(plane, radius0, radius1, turns);
-
-            // Finally assign the spiral to the output parameter.
-            //DA.SetData(0, spiral);
             DA.SetData(0, null);
-        }
-
-        Curve CreateSpiral(Plane plane, double r0, double r1, Int32 turns)
-        {
-            Line l0 = new Line(plane.Origin + r0 * plane.XAxis, plane.Origin + r1 * plane.XAxis);
-            Line l1 = new Line(plane.Origin - r0 * plane.XAxis, plane.Origin - r1 * plane.XAxis);
-
-            Point3d[] p0;
-            Point3d[] p1;
-
-            l0.ToNurbsCurve().DivideByCount(turns, true, out p0);
-            l1.ToNurbsCurve().DivideByCount(turns, true, out p1);
-
-            PolyCurve spiral = new PolyCurve();
-
-            for (int i = 0; i < p0.Length - 1; i++)
-            {
-                Arc arc0 = new Arc(p0[i], plane.YAxis, p1[i + 1]);
-                Arc arc1 = new Arc(p1[i + 1], -plane.YAxis, p0[i + 1]);
-
-                spiral.Append(arc0);
-                spiral.Append(arc1);
-            }
-
-            return spiral;
+            DA.SetData(1, walls.Count.ToString());
         }
 
         /// <summary>
