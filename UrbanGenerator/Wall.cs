@@ -21,7 +21,8 @@ namespace UrbanGenerator
         public PointF RelEndPoint1;
         public PointF RelEndPoint2;
 
-        public Brep WallSurface;
+        public LineCurve GroundLine;
+        public PlaneSurface WallSurface;
 
         public Wall(float averageCeilingHeight, int numOfConditionedFloorsAboveGrade, float azimuth, float area)
         {

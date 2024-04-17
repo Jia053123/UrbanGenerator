@@ -4,6 +4,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace UrbanGenerator
 {
@@ -37,6 +38,7 @@ namespace UrbanGenerator
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddCurveParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
+            pManager.AddSurfaceParameter("Walls", "W", "Building Walls", GH_ParamAccess.list);
             pManager.AddTextParameter("debug", "d", "debug message", GH_ParamAccess.item);
             //pManager.AddBrepParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
         }
@@ -50,24 +52,19 @@ namespace UrbanGenerator
         {
             string modelsDir = null;
             if (!DA.GetData(0, ref modelsDir)) return;
-            //Console.WriteLine(path);
 
             string modelDir = Directory.GetDirectories(modelsDir)[0];
             string pathToModel = Directory.GetFiles(modelDir, "*.xml")[0];
 
             ModelParser modelParser = new ModelParser(pathToModel);
             var building = new Building(modelParser);
-            var listOfLines = new List<Curve>();
-            foreach(var wall in building.Walls)
-            {
-                var pointFrom = new Point3d(wall.RelEndPoint1.X, wall.RelEndPoint1.Y, 0);
-                var pointTo = new Point3d(wall.RelEndPoint2.X, wall.RelEndPoint2.Y, 0);
-                var newLine = new LineCurve(pointFrom, pointTo);
-                listOfLines.Add(newLine);
-            }
+
+            var listOfLines = building.Walls.Select(w => w.GroundLine).ToList();
+            var listOfSurfaces = building.Walls.Select(w => w.WallSurface).ToList();
 
             DA.SetDataList(0, listOfLines);
-            DA.SetData(1, listOfLines.Count.ToString());
+            DA.SetDataList(1, listOfSurfaces);
+            DA.SetData(2, listOfLines.Count.ToString());
         }
 
         /// <summary>
