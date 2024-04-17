@@ -12,40 +12,33 @@ namespace UrbanGenerator
         private XmlDocument model;
         //private string nameSpaceName;
         private XmlNamespaceManager nsManager;
-        public ModelParser(string pathToModel)
-        {
-            this.model = new XmlDocument();
-            this.model.Load(pathToModel);
-            this.nsManager = new XmlNamespaceManager(model.NameTable);
-            nsManager.AddNamespace("ns0", this.model.DocumentElement.GetNamespaceOfPrefix("ns0"));
-        }
 
-        public int YearBuilt
-        {
-            get
-            {
-                XmlNode node = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:BuildingSummary/ns0:BuildingConstruction/ns0:YearBuilt", this.nsManager);
-                int.TryParse(node.InnerText, out int yearBuilt);
-                return yearBuilt;
-            }
-        }
+        //public int YearBuilt
+        //{
+        //    get
+        //    {
+        //        XmlNode node = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:BuildingSummary/ns0:BuildingConstruction/ns0:YearBuilt", this.nsManager);
+        //        int.TryParse(node.InnerText, out int yearBuilt);
+        //        return yearBuilt;
+        //    }
+        //}
 
-        public string ResidentialFacilityType
-        {
-            get
-            {
-                XmlNode node = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:BuildingSummary/ns0:BuildingConstruction/ns0:ResidentialFacilityType", this.nsManager);
-                return node.InnerText;
-            }
-        }
+        //public string ResidentialFacilityType
+        //{
+        //    get
+        //    {
+        //        XmlNode node = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:BuildingSummary/ns0:BuildingConstruction/ns0:ResidentialFacilityType", this.nsManager);
+        //        return node.InnerText;
+        //    }
+        //}
 
         public int NumOfConditionedFloorsAboveGrade
         {
             get
             {
                 XmlNode node = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:BuildingSummary/ns0:BuildingConstruction/ns0:NumberofConditionedFloorsAboveGrade", this.nsManager);
-                int.TryParse(node.InnerText, out int numOfFloors);
-                return numOfFloors;
+                float.TryParse(node.InnerText, out float numOfFloors);
+                return (int)numOfFloors;
             }
         }
 
@@ -59,7 +52,9 @@ namespace UrbanGenerator
             }
         }
 
-        public XmlNodeList Walls
+        public List<Wall> Walls;
+
+        private XmlNodeList WallsNodes
         {
             get
             {
@@ -68,12 +63,35 @@ namespace UrbanGenerator
             }
         }
 
-        public XmlNodeList Floors
+        //private XmlNodeList Floors
+        //{
+        //    get
+        //    {
+        //        XmlNode floors = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:Enclosure/ns0:Floors", this.nsManager);
+        //        return floors.ChildNodes;
+        //    }
+        //}
+
+        public ModelParser(string pathToModel)
         {
-            get
+            this.model = new XmlDocument();
+            this.model.Load(pathToModel);
+            this.nsManager = new XmlNamespaceManager(model.NameTable);
+            nsManager.AddNamespace("ns0", this.model.DocumentElement.GetNamespaceOfPrefix("ns0"));
+
+            this.InitializeWalls();
+        }
+
+        private void InitializeWalls()
+        {
+            this.Walls = new List<Wall>();
+
+            foreach (XmlNode wallNode in this.WallsNodes)
             {
-                XmlNode floors = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:Enclosure/ns0:Floors", this.nsManager);
-                return floors.ChildNodes;
+                int.TryParse(wallNode.SelectSingleNode("ns0:Azimuth", this.nsManager).InnerText, out int azimuth);
+                float.TryParse(wallNode.SelectSingleNode("ns0:Area", this.nsManager).InnerText, out float area);
+                var newWall = new Wall(this.AverageCeilingHeight, this.NumOfConditionedFloorsAboveGrade, azimuth, area);
+                this.Walls.Add(newWall);
             }
         }
     }
