@@ -59,8 +59,8 @@ namespace UrbanGenerator
             ModelParser modelParser = new ModelParser(pathToModel);
             var building = new Building(modelParser);
 
-            var listOfLines = building.Walls.Select(w => w.GroundLine).ToList();
-            var listOfSurfaces = building.Walls.Select(w => w.WallSurface).ToList();
+            var listOfLines = building.MajorWalls.Select(w => w.GroundLine).ToList();
+            var listOfSurfaces = building.MajorWalls.Select(w => w.WallSurface).ToList();
 
             DA.SetDataList(0, listOfLines);
             DA.SetDataList(1, listOfSurfaces);
