@@ -10,12 +10,12 @@ namespace UrbanGenerator
     class Roof
     {
         public float Area { get; }
-        public float Azimuth { get; }
+        public int Azimuth { get; }
         public float Pitch { get; }
 
         public PlaneSurface RoofSurface;
 
-        public Roof(float azimuth, float area, float pitch)
+        public Roof(int azimuth, float area, float pitch)
         {
             this.Azimuth = azimuth;
             this.Area = area;

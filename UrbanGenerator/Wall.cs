@@ -12,7 +12,7 @@ namespace UrbanGenerator
     {
         public float AverageCeilingHeight { get; }
         public int NumOfConditionedFloorsAboveGrade { get; }
-        public float Azimuth { get; }
+        public int Azimuth { get; }
         public float Area { get; }
         public string ExteriorAdjacentTo { get; }
         public string InteriorAdjacentTo { get; }
@@ -26,7 +26,7 @@ namespace UrbanGenerator
         public LineCurve GroundLine;
         public PlaneSurface WallSurface;
 
-        public Wall(float averageCeilingHeight, int numOfConditionedFloorsAboveGrade, float azimuth, float area, string exteriorAdjacentTo, string interiorAdjacentTo)
+        public Wall(float averageCeilingHeight, int numOfConditionedFloorsAboveGrade, int azimuth, float area, string exteriorAdjacentTo, string interiorAdjacentTo)
         {
             this.AverageCeilingHeight = averageCeilingHeight;
             this.NumOfConditionedFloorsAboveGrade = numOfConditionedFloorsAboveGrade;

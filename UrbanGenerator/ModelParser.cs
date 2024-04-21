@@ -107,7 +107,7 @@ namespace UrbanGenerator
             nsManager.AddNamespace("ns0", this.model.DocumentElement.GetNamespaceOfPrefix("ns0"));
 
             this.InitializeWalls();
-            if(!(this.RoofsNodes is null))
+            if(!(this.RoofsNodes is null)) 
             {
                 this.InitializeRoofs();
             }

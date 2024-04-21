@@ -37,8 +37,9 @@ namespace UrbanGenerator
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Footprint", "F", "Building Footprint", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Walls", "W", "Building Walls", GH_ParamAccess.list);
+            pManager.AddSurfaceParameter("Roofs", "R", "Building Roofs", GH_ParamAccess.list);
             pManager.AddTextParameter("debug", "d", "debug message", GH_ParamAccess.item);
             //pManager.AddBrepParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
         }
@@ -60,11 +61,13 @@ namespace UrbanGenerator
             var building = new Building(modelParser);
 
             var listOfLines = building.MajorWalls.Select(w => w.GroundLine).ToList();
-            var listOfSurfaces = building.MajorWalls.Select(w => w.WallSurface).ToList();
+            var listOfWalls = building.MajorWalls.Select(w => w.WallSurface).ToList();
+            var listOfRoofs = building.Roofs.Select(r => r.RoofSurface).ToList();
 
             DA.SetDataList(0, listOfLines);
-            DA.SetDataList(1, listOfSurfaces);
-            DA.SetData(2, listOfLines.Count.ToString());
+            DA.SetDataList(1, listOfWalls);
+            DA.SetDataList(2, listOfRoofs);
+            DA.SetData(3, listOfLines.Count.ToString());
         }
 
         /// <summary>
