@@ -37,6 +37,10 @@ namespace UrbanGenerator
             {
                 this.Roofs = this.Parser.Roofs.OrderByDescending(roof => roof.Area).ToList(); // Sort by size large to small
                 InitializeRoofs();
+            } 
+            else
+            {
+                this.Roofs = new List<Roof>();
             }
         }
 
