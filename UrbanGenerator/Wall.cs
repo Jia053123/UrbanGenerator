@@ -17,11 +17,11 @@ namespace UrbanGenerator
         public string ExteriorAdjacentTo { get; }
         public string InteriorAdjacentTo { get; }
 
-        public float Height => this.AverageCeilingHeight * this.NumOfConditionedFloorsAboveGrade;
+        public float Height => this.AverageCeilingHeight * this.NumOfConditionedFloorsAboveGrade; // + floor thickness! 
         public float Length => this.Area / this.Height;
 
-        public PointF RelEndPoint1;
-        public PointF RelEndPoint2;
+        public PointF RelativeEndPoint1;
+        public PointF RelativeEndPoint2;
 
         public LineCurve GroundLine;
         public PlaneSurface WallSurface;

@@ -13,6 +13,31 @@ namespace UrbanGenerator
     {
         public ModelParser Parser { get; }
 
+        public PointF CentroidLocation 
+        {
+            get => this._centriodLocation;
+            set 
+            {
+                var currentCentroid = this.FindWallsCentroid();
+                var translation = new Vector3d(value.X - currentCentroid.X, value.Y - currentCentroid.Y, 0);
+
+                foreach (var wall in this.MajorWalls)
+                {
+                    wall.GroundLine.Translate(translation);
+                    wall.WallSurface.Translate(translation);
+                }
+                foreach (var roof in this.Roofs)
+                {
+                    if (roof.RoofSurface is null) continue;
+                    roof.RoofSurface.Translate(translation);
+                }
+
+                this._centriodLocation = value;
+            } 
+        }
+
+        private PointF _centriodLocation = PointF.Empty;
+
         /// <summary>
         /// All walls sorted by azimuth, in order of north, east, south, west
         /// </summary>
@@ -23,7 +48,7 @@ namespace UrbanGenerator
         /// </summary>
         public List<Roof> Roofs { get; }
 
-        public Building(ModelParser modelParser)
+        public Building(ModelParser modelParser, PointF centroidLocation)
         {
             this.Parser = modelParser;
             var majorWalls = this.Parser.Walls
@@ -42,6 +67,8 @@ namespace UrbanGenerator
             {
                 this.Roofs = new List<Roof>();
             }
+
+            this.CentroidLocation = centroidLocation;
         }
 
         private void InitializeWalls()
@@ -50,11 +77,11 @@ namespace UrbanGenerator
             PointF currentPoint = new PointF(0, 0);
             foreach (var wall in this.MajorWalls)
             {
-                wall.RelEndPoint1 = currentPoint;
+                wall.RelativeEndPoint1 = currentPoint;
                 float azimuthRad = (float)(wall.Azimuth * (Math.PI / 180));
                 currentPoint.X += (float)(Math.Cos(azimuthRad) * wall.Length);
                 currentPoint.Y += (float)(Math.Sin(azimuthRad) * wall.Length);
-                wall.RelEndPoint2 = currentPoint;
+                wall.RelativeEndPoint2 = currentPoint;
             }
 
             //Walls.Last().RelEndPoint2 = Walls.First().RelEndPoint1;
@@ -62,8 +89,8 @@ namespace UrbanGenerator
             // Step2: extrude surfaces
             foreach (var wall in this.MajorWalls)
             {
-                var pointFrom = new Point3d(wall.RelEndPoint1.X, wall.RelEndPoint1.Y, 0);
-                var pointTo = new Point3d(wall.RelEndPoint2.X, wall.RelEndPoint2.Y, 0);
+                var pointFrom = new Point3d(wall.RelativeEndPoint1.X, wall.RelativeEndPoint1.Y, 0);
+                var pointTo = new Point3d(wall.RelativeEndPoint2.X, wall.RelativeEndPoint2.Y, 0);
                 wall.GroundLine = new LineCurve(pointFrom, pointTo);
 
                 var plane = Plane.WorldZX;
@@ -104,7 +131,7 @@ namespace UrbanGenerator
 
         private PointF FindWallsCentroid()
         {
-            var endPoint1s = this.MajorWalls.Select(wall => wall.RelEndPoint1).ToList();
+            var endPoint1s = this.MajorWalls.Select(wall => wall.RelativeEndPoint1).ToList();
             return GetCentroid(endPoint1s);
         }
 

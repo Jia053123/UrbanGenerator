@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Drawing;
 
 namespace UrbanGenerator
 {
@@ -23,6 +24,10 @@ namespace UrbanGenerator
             "ResStock", "")
         {
         }
+
+        private float DisplayGridDistance => 80.0f;
+        private int DisplayGridSizeX => 2;
+        //private int DisplayGridSizeY => 3;
 
         /// <summary>
         /// Registers all the input parameters for this component.
@@ -54,15 +59,32 @@ namespace UrbanGenerator
             string modelsDir = null;
             if (!DA.GetData(0, ref modelsDir)) return;
 
-            string modelDir = Directory.GetDirectories(modelsDir)[0];
-            string pathToModel = Directory.GetFiles(modelDir, "*.xml")[0];
+            var modelDirs = Directory.GetDirectories(modelsDir);
+            var listOfLines = new List<LineCurve>();
+            var listOfWalls = new List<PlaneSurface>();
+            var listOfRoofs = new List<PlaneSurface>();
 
-            ModelParser modelParser = new ModelParser(pathToModel);
-            var building = new Building(modelParser);
+            int x_loc = 0;
+            int y_loc = 0;
+            foreach (string modelDir in modelDirs)
+            {
+                string pathToModel = Directory.GetFiles(modelDir, "*.xml")[0];
 
-            var listOfLines = building.MajorWalls.Select(w => w.GroundLine).ToList();
-            var listOfWalls = building.MajorWalls.Select(w => w.WallSurface).ToList();
-            var listOfRoofs = building.Roofs.Select(r => r.RoofSurface).ToList();
+                //string modelDir = Directory.GetDirectories(modelsDir)[0];
+                ModelParser modelParser = new ModelParser(pathToModel);
+                var building = new Building(modelParser, new PointF(x_loc * this.DisplayGridDistance, y_loc * this.DisplayGridDistance));
+
+                listOfLines.AddRange(building.MajorWalls.Select(w => w.GroundLine).ToList());
+                listOfWalls.AddRange(building.MajorWalls.Select(w => w.WallSurface).ToList());
+                listOfRoofs.AddRange(building.Roofs.Select(r => r.RoofSurface).ToList());
+
+                x_loc += 1;
+                if (x_loc > (this.DisplayGridSizeX-1))
+                {
+                    x_loc = 0;
+                    y_loc += 1;
+                }
+            }
 
             DA.SetDataList(0, listOfLines);
             DA.SetDataList(1, listOfWalls);
