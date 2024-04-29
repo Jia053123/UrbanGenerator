@@ -124,12 +124,24 @@ namespace UrbanGenerator
                     wallAttached.WallSurface.TryGetPlane(out var windowPlane);
                     var bb = wallAttached.WallSurface.GetBoundingBox(windowPlane);
                     var diff = bb.PointAt(0.5, 0.5, 1) - bb.PointAt(0, 0, 1);
-                    var translation = new Vector3d(0, diff.Y, diff.X);
+                    var translation = new Vector3d(diff.Z, diff.Y, diff.X);
                     float azimuthRad = (float)((window.Azimuth-90) * (Math.PI / 180));
                     translation.Rotate(azimuthRad, Vector3d.ZAxis);
 
-                    var yExtent = new Interval( -1 * Math.Sqrt(window.Area)/2, Math.Sqrt(window.Area)/2);
-                    var xExtent = yExtent;
+                    float windowWidth;
+                    float windowHeight;
+                    if (!(window.Overhang is null))
+                    {
+                        windowHeight = window.Overhang.DistanceToBottomOfWindow - window.Overhang.DistanceToTopOfWindow;
+                        windowWidth = window.Area / windowHeight;
+                    }
+                    else
+                    {
+                        windowHeight = (float)Math.Sqrt(window.Area);
+                        windowWidth = windowHeight;
+                    }
+                    var yExtent = new Interval(-1 * windowWidth / 2, windowWidth / 2); 
+                    var xExtent = new Interval(-1 * windowHeight / 2, windowHeight / 2);
                     var windowSurface = new PlaneSurface(windowPlane, xExtent, yExtent);
                     windowSurface.Translate(translation);
                     window.WindowSurface = windowSurface;
