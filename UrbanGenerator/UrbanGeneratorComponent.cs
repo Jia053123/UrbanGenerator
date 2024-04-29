@@ -43,7 +43,8 @@ namespace UrbanGenerator
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddCurveParameter("Footprint", "F", "Building Footprint", GH_ParamAccess.list);
-            pManager.AddSurfaceParameter("Walls", "W", "Building Walls", GH_ParamAccess.list);
+            pManager.AddSurfaceParameter("Walls", "Wa", "Building Walls", GH_ParamAccess.list);
+            pManager.AddSurfaceParameter("Windows", "Win", "Building Windows", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Roofs", "R", "Building Roofs", GH_ParamAccess.list);
             pManager.AddTextParameter("debug", "d", "debug message", GH_ParamAccess.item);
             //pManager.AddBrepParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
@@ -67,6 +68,7 @@ namespace UrbanGenerator
 
             var listOfLines = new List<LineCurve>();
             var listOfWalls = new List<PlaneSurface>();
+            var listOfWindows = new List<PlaneSurface>();
             var listOfRoofs = new List<PlaneSurface>();
 
             int x_loc = 0;
@@ -80,6 +82,7 @@ namespace UrbanGenerator
 
                 listOfLines.AddRange(building.MajorWalls.Select(w => w.GroundLine).ToList());
                 listOfWalls.AddRange(building.MajorWalls.Select(w => w.WallSurface).ToList());
+                listOfWindows.AddRange(building.Windows.Select(w => w.WindowSurface).ToList());
                 listOfRoofs.AddRange(building.Roofs.Select(r => r.RoofSurface).ToList());
 
                 x_loc += 1;
@@ -92,8 +95,9 @@ namespace UrbanGenerator
 
             DA.SetDataList(0, listOfLines);
             DA.SetDataList(1, listOfWalls);
-            DA.SetDataList(2, listOfRoofs);
-            DA.SetData(3, listOfLines.Count.ToString());
+            DA.SetDataList(2, listOfWindows);
+            DA.SetDataList(3, listOfRoofs);
+            DA.SetData(4, listOfLines.Count.ToString());
         }
 
         /// <summary>

@@ -26,6 +26,11 @@ namespace UrbanGenerator
                     wall.GroundLine.Translate(translation);
                     wall.WallSurface.Translate(translation);
                 }
+                foreach (var window in this.Windows)
+                {
+                    window.WindowSurface.Translate(translation);
+                }
+                
                 foreach (var roof in this.Roofs)
                 {
                     if (roof.RoofSurface is null) continue;
@@ -42,6 +47,7 @@ namespace UrbanGenerator
         /// All walls sorted by azimuth, in order of north, east, south, west
         /// </summary>
         public List<Wall> MajorWalls { get; }
+        public List<Window> Windows { get; }
 
         /// <summary>
         /// All roofs sorted by area, large to small
@@ -57,6 +63,9 @@ namespace UrbanGenerator
             this.MajorWalls = majorWalls.OrderBy(wall => wall.Azimuth).ToList(); // Sort by orientation, north, east, south, west
 
             InitializeWalls();
+
+            this.Windows = this.Parser.Windows;
+            InitializeWindows();
 
             if (!(this.Parser.Roofs is null))
             {
@@ -101,6 +110,30 @@ namespace UrbanGenerator
                 var newSurface = new PlaneSurface(plane, yExtents, xExtents);
                 newSurface.Translate(new Vector3d(wall.GroundLine.PointAtStart));
                 wall.WallSurface = newSurface;
+            }
+        }
+
+        private void InitializeWindows()
+        {
+            foreach(var window in this.Windows)
+            {
+                var wallsAttached = this.MajorWalls.Where(w => w.ID == window.WallIdAttachedTo);
+                if(wallsAttached.Count() > 0)
+                {
+                    var wallAttached = wallsAttached.First();
+                    wallAttached.WallSurface.TryGetPlane(out var windowPlane);
+                    var bb = wallAttached.WallSurface.GetBoundingBox(windowPlane);
+                    var diff = bb.PointAt(0.5, 0.5, 1) - bb.PointAt(0, 0, 1);
+                    var translation = new Vector3d(0, diff.Y, diff.X);
+                    float azimuthRad = (float)((window.Azimuth-90) * (Math.PI / 180));
+                    translation.Rotate(azimuthRad, Vector3d.ZAxis);
+
+                    var yExtent = new Interval( -1 * Math.Sqrt(window.Area)/2, Math.Sqrt(window.Area)/2);
+                    var xExtent = yExtent;
+                    var windowSurface = new PlaneSurface(windowPlane, xExtent, yExtent);
+                    windowSurface.Translate(translation);
+                    window.WindowSurface = windowSurface;
+                }
             }
         }
 
