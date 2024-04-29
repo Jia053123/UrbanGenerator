@@ -45,9 +45,9 @@ namespace UrbanGenerator
             pManager.AddCurveParameter("Footprint", "F", "Building Footprint", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Walls", "Wa", "Building Walls", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Windows", "Win", "Building Windows", GH_ParamAccess.list);
+            pManager.AddSurfaceParameter("Overhangs", "Over", "Window Overhangs", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Roofs", "R", "Building Roofs", GH_ParamAccess.list);
             pManager.AddTextParameter("debug", "d", "debug message", GH_ParamAccess.item);
-            //pManager.AddBrepParameter("Models", "M", "Model Visualizations", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -63,12 +63,10 @@ namespace UrbanGenerator
             var modelDirs = Directory.GetDirectories(modelsDir);
             var pathsToModels = modelDirs.Select(md => Directory.GetFiles(md, "*.xml")[0]);
 
-
-
-
             var listOfLines = new List<LineCurve>();
             var listOfWalls = new List<PlaneSurface>();
             var listOfWindows = new List<PlaneSurface>();
+            var listOfOverhangs = new List<PlaneSurface>();
             var listOfRoofs = new List<PlaneSurface>();
 
             int x_loc = 0;
@@ -83,6 +81,7 @@ namespace UrbanGenerator
                 listOfLines.AddRange(building.MajorWalls.Select(w => w.GroundLine).ToList());
                 listOfWalls.AddRange(building.MajorWalls.Select(w => w.WallSurface).ToList());
                 listOfWindows.AddRange(building.Windows.Select(w => w.WindowSurface).ToList());
+                listOfOverhangs.AddRange(building.Windows.Select(w => w.Overhang.OverhangSurface).ToList());
                 listOfRoofs.AddRange(building.Roofs.Select(r => r.RoofSurface).ToList());
 
                 x_loc += 1;
@@ -96,8 +95,9 @@ namespace UrbanGenerator
             DA.SetDataList(0, listOfLines);
             DA.SetDataList(1, listOfWalls);
             DA.SetDataList(2, listOfWindows);
-            DA.SetDataList(3, listOfRoofs);
-            DA.SetData(4, listOfLines.Count.ToString());
+            DA.SetDataList(3, listOfOverhangs);
+            DA.SetDataList(4, listOfRoofs);
+            DA.SetData(5, listOfLines.Count.ToString());
         }
 
         /// <summary>

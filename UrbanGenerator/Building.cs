@@ -26,9 +26,14 @@ namespace UrbanGenerator
                     wall.GroundLine.Translate(translation);
                     wall.WallSurface.Translate(translation);
                 }
+
                 foreach (var window in this.Windows)
                 {
                     window.WindowSurface.Translate(translation);
+                    if (!(window.Overhang is null))
+                    {
+                        window.Overhang.OverhangSurface.Translate(translation);
+                    }
                 }
                 
                 foreach (var roof in this.Roofs)
@@ -124,9 +129,9 @@ namespace UrbanGenerator
                     wallAttached.WallSurface.TryGetPlane(out var windowPlane);
                     var bb = wallAttached.WallSurface.GetBoundingBox(windowPlane);
                     var diff = bb.PointAt(0.5, 0.5, 1) - bb.PointAt(0, 0, 1);
-                    var translation = new Vector3d(diff.Z, diff.Y, diff.X);
+                    var windowTranslation = new Vector3d(diff.Z, diff.Y, diff.X);
                     float azimuthRad = (float)((window.Azimuth-90) * (Math.PI / 180));
-                    translation.Rotate(azimuthRad, Vector3d.ZAxis);
+                    windowTranslation.Rotate(azimuthRad, Vector3d.ZAxis);
 
                     float windowWidth;
                     float windowHeight;
@@ -134,6 +139,18 @@ namespace UrbanGenerator
                     {
                         windowHeight = window.Overhang.DistanceToBottomOfWindow - window.Overhang.DistanceToTopOfWindow;
                         windowWidth = window.Area / windowHeight;
+
+                        var overhangPlane = windowPlane.Clone();
+                        var overhangRotateAxis = Vector3d.YAxis;
+                        overhangRotateAxis.Rotate(azimuthRad, Vector3d.ZAxis);
+                        overhangPlane.Rotate(Math.PI / 2, overhangRotateAxis);
+                        var overhangYExtent = new Interval(-1 * windowWidth / 2, windowWidth / 2);
+                        var overhangXExtent = new Interval(0, window.Overhang.Depth);
+                        var overhangSurface = new PlaneSurface(overhangPlane, overhangXExtent, overhangYExtent);
+                        overhangSurface.Translate(windowTranslation);
+                        var overhangZTranslation = new Vector3d(0,0, windowHeight / 2.0f + window.Overhang.DistanceToTopOfWindow);
+                        overhangSurface.Translate(overhangZTranslation);
+                        window.Overhang.OverhangSurface = overhangSurface;
                     }
                     else
                     {
@@ -143,7 +160,7 @@ namespace UrbanGenerator
                     var yExtent = new Interval(-1 * windowWidth / 2, windowWidth / 2); 
                     var xExtent = new Interval(-1 * windowHeight / 2, windowHeight / 2);
                     var windowSurface = new PlaneSurface(windowPlane, xExtent, yExtent);
-                    windowSurface.Translate(translation);
+                    windowSurface.Translate(windowTranslation);
                     window.WindowSurface = windowSurface;
                 }
             }
