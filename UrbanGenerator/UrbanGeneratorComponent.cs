@@ -60,18 +60,22 @@ namespace UrbanGenerator
             if (!DA.GetData(0, ref modelsDir)) return;
 
             var modelDirs = Directory.GetDirectories(modelsDir);
+            var pathsToModels = modelDirs.Select(md => Directory.GetFiles(md, "*.xml")[0]);
+
+
+
+
             var listOfLines = new List<LineCurve>();
             var listOfWalls = new List<PlaneSurface>();
             var listOfRoofs = new List<PlaneSurface>();
 
             int x_loc = 0;
             int y_loc = 0;
-            foreach (string modelDir in modelDirs)
-            {
-                string pathToModel = Directory.GetFiles(modelDir, "*.xml")[0];
 
-                //string modelDir = Directory.GetDirectories(modelsDir)[0];
-                ModelParser modelParser = new ModelParser(pathToModel);
+            foreach (string pathToModel in pathsToModels)
+            {
+
+                ParsedModel modelParser = new ParsedModel(pathToModel);
                 var building = new Building(modelParser, new PointF(x_loc * this.DisplayGridDistance, y_loc * this.DisplayGridDistance));
 
                 listOfLines.AddRange(building.MajorWalls.Select(w => w.GroundLine).ToList());

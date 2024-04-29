@@ -9,7 +9,7 @@ namespace UrbanGenerator
 {
     class SingleFamilyDetachedBuilding : Building
     {
-        public SingleFamilyDetachedBuilding(ModelParser modelParser, PointF centroidLocation) : base(modelParser, centroidLocation) 
+        public SingleFamilyDetachedBuilding(ParsedModel modelParser, PointF centroidLocation) : base(modelParser, centroidLocation) 
         {
 
         }

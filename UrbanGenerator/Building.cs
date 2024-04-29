@@ -11,7 +11,7 @@ namespace UrbanGenerator
 {
     class Building
     {
-        public ModelParser Parser { get; }
+        public ParsedModel Parser { get; }
 
         public PointF CentroidLocation 
         {
@@ -48,9 +48,9 @@ namespace UrbanGenerator
         /// </summary>
         public List<Roof> Roofs { get; }
 
-        public Building(ModelParser modelParser, PointF centroidLocation)
+        public Building(ParsedModel parsedModel, PointF centroidLocation)
         {
-            this.Parser = modelParser;
+            this.Parser = parsedModel;
             var majorWalls = this.Parser.Walls
                 .FindAll(wall => wall.ExteriorAdjacentTo == "outside" || wall.ExteriorAdjacentTo == "other housing unit")
                 .FindAll(wall => wall.InteriorAdjacentTo == "living space" || wall.InteriorAdjacentTo == "garage");

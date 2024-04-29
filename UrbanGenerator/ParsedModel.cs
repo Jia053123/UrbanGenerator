@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace UrbanGenerator
 {
-    class ModelParser
+    class ParsedModel
     {
         private XmlDocument model;
         //private string nameSpaceName;
@@ -99,7 +99,7 @@ namespace UrbanGenerator
         //    }
         //}
 
-        public ModelParser(string pathToModel)
+        public ParsedModel(string pathToModel)
         {
             this.model = new XmlDocument();
             this.model.Load(pathToModel);
