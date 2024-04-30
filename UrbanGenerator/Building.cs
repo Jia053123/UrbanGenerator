@@ -13,6 +13,21 @@ namespace UrbanGenerator
     {
         public ParsedModel Parser { get; }
 
+        public float ConditionedFloorArea { get; }
+        public int NumOfConditionedFloorsAboveGrade { get; }
+        public float AverageCeilingHeight { get; }
+
+        /// <summary>
+        /// All walls sorted by azimuth, in order of north, east, south, west
+        /// </summary>
+        public List<Wall> MajorWalls { get; }
+        public List<Window> Windows { get; }
+
+        /// <summary>
+        /// All roofs sorted by area, large to small
+        /// </summary>
+        public List<Roof> Roofs { get; }
+
         public PointF CentroidLocation 
         {
             get => this._centriodLocation;
@@ -48,23 +63,16 @@ namespace UrbanGenerator
 
         private PointF _centriodLocation = PointF.Empty;
 
-        /// <summary>
-        /// All walls sorted by azimuth, in order of north, east, south, west
-        /// </summary>
-        public List<Wall> MajorWalls { get; }
-        public List<Window> Windows { get; }
-
-        /// <summary>
-        /// All roofs sorted by area, large to small
-        /// </summary>
-        public List<Roof> Roofs { get; }
-
         public Building(ParsedModel parsedModel, PointF centroidLocation)
         {
             this.Parser = parsedModel;
-            var majorWalls = this.Parser.Walls
-                .FindAll(wall => wall.ExteriorAdjacentTo == "outside" || wall.ExteriorAdjacentTo == "other housing unit")
-                .FindAll(wall => wall.InteriorAdjacentTo == "living space" || wall.InteriorAdjacentTo == "garage");
+            this.ConditionedFloorArea = parsedModel.ConditionedFloorArea;
+            this.NumOfConditionedFloorsAboveGrade = parsedModel.NumOfConditionedFloorsAboveGrade;
+            this.AverageCeilingHeight = parsedModel.AverageCeilingHeight;
+
+            var majorWalls = this.Parser.Walls.FindAll(wall => wall.InteriorAdjacentTo == "living space");
+            //.FindAll(wall => wall.ExteriorAdjacentTo == "outside" || wall.ExteriorAdjacentTo == "other housing unit" || wall.ExteriorAdjacentTo == "garage")
+
             this.MajorWalls = majorWalls.OrderBy(wall => wall.Azimuth).ToList(); // Sort by orientation, north, east, south, west
 
             InitializeWalls();
@@ -168,23 +176,38 @@ namespace UrbanGenerator
 
         private void InitializeRoofs()
         {
-            if (this.Roofs.Count == 2)
+            //if (this.Roofs.Count == 2)
             {
                 foreach (var roof in this.Roofs)
                 {
-                    var length = this.MajorWalls.Where(wall => wall.Azimuth == roof.Azimuth).Select(wall => wall.Length).Sum();
-                    var width = roof.Area / length;
-
+                    float length;
+                    float width;
+                    float azimuthRad;
+                    float pitchRad;
                     var plane = Plane.WorldXY;
-                    float azimuthRad = (float)(roof.Azimuth * (Math.PI / 180));
-                    float pitchRad = (float)Math.Atan2(6, 12);
+                    if (roof.Pitch > 0)
+                    {
+                        length = this.MajorWalls.Where(wall => wall.Azimuth == roof.Azimuth).Select(wall => wall.Length).Sum();
+                        width = roof.Area / length;
+
+                        azimuthRad = (float)(roof.Azimuth * (Math.PI / 180));
+                        pitchRad = (float)Math.Atan2(roof.Pitch, 12);
+                    }
+                    else
+                    {
+                        // flat roof
+                        length = this.MajorWalls.Where(wall => wall.Azimuth == this.MajorWalls.First().Azimuth).Select(wall => wall.Length).Sum();
+                        width = roof.Area / length;
+                        azimuthRad = (float)(this.MajorWalls.First().Azimuth * (Math.PI / 180));
+                        pitchRad = 0.0f;
+                    }
                     plane.Rotate(-1 * pitchRad, Vector3d.XAxis);
                     plane.Rotate(azimuthRad, Vector3d.ZAxis);
                     var cetroid2d = this.FindWallsCentroid();
                     var roofHeight = this.MajorWalls.First().Height + Math.Sin(pitchRad) * width;
                     plane.Translate(new Vector3d(cetroid2d.X, cetroid2d.Y, roofHeight));
                     var xExtents = new Interval(0, width);
-                    var yExtents = new Interval(length/2*-1, length/2);
+                    var yExtents = new Interval(length / 2 * -1, length / 2);
                     var newSurface = new PlaneSurface(plane, yExtents, xExtents);
                     roof.RoofSurface = newSurface;
                 }

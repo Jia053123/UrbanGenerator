@@ -52,6 +52,16 @@ namespace UrbanGenerator
             }
         }
 
+        public float ConditionedFloorArea
+        {
+            get
+            {
+                XmlNode node = this.model.DocumentElement.SelectSingleNode("/ns0:HPXML/ns0:Building/ns0:BuildingDetails/ns0:BuildingSummary/ns0:BuildingConstruction/ns0:ConditionedFloorArea", this.nsManager);
+                float.TryParse(node.InnerText, out float conditionedFloorArea);
+                return conditionedFloorArea;
+            }
+        }
+
         public List<Wall> Walls;
         public List<Roof> Roofs;
         public List<Window> Windows;
@@ -146,7 +156,12 @@ namespace UrbanGenerator
 
             foreach (XmlNode roofNode in this.RoofsNodes)
             {
-                int.TryParse(roofNode.SelectSingleNode("ns0:Azimuth", this.nsManager).InnerText, out int azimuth);
+                var azimuthNode = roofNode.SelectSingleNode("ns0:Azimuth", this.nsManager);
+                int azimuth = 0;
+                if (!(azimuthNode is null))
+                {
+                    int.TryParse(azimuthNode.InnerText, out azimuth);
+                }
                 float.TryParse(roofNode.SelectSingleNode("ns0:Area", this.nsManager).InnerText, out float area);
                 float.TryParse(roofNode.SelectSingleNode("ns0:Pitch", this.nsManager).InnerText, out float pitch);
                 var newRoof = new Roof(azimuth, area, pitch);
