@@ -185,10 +185,17 @@ namespace UrbanGenerator
                     float azimuthRad;
                     float pitchRad;
                     var plane = Plane.WorldXY;
+                    var wallsFacingSameDirection = this.MajorWalls.Where(wall => wall.Azimuth == roof.Azimuth);
+                    if (wallsFacingSameDirection.Count() == 0)
+                    {
+                        wallsFacingSameDirection = this.MajorWalls.Where(wall => wall.Azimuth == this.MajorWalls.First().Azimuth);
+                    }
+                    length = wallsFacingSameDirection.Select(wall => wall.Length).Sum();
+                    width = roof.Area / length;
                     if (roof.Pitch > 0)
                     {
-                        length = this.MajorWalls.Where(wall => wall.Azimuth == roof.Azimuth).Select(wall => wall.Length).Sum();
-                        width = roof.Area / length;
+                        //length = wallsFacingSameDirection.Select(wall => wall.Length).Sum();
+                        //width = roof.Area / length;
 
                         azimuthRad = (float)(roof.Azimuth * (Math.PI / 180));
                         pitchRad = (float)Math.Atan2(roof.Pitch, 12);
@@ -196,16 +203,32 @@ namespace UrbanGenerator
                     else
                     {
                         // flat roof
-                        length = this.MajorWalls.Where(wall => wall.Azimuth == this.MajorWalls.First().Azimuth).Select(wall => wall.Length).Sum();
-                        width = roof.Area / length;
+                        //length = this.MajorWalls.Where(wall => wall.Azimuth == this.MajorWalls.First().Azimuth).Select(wall => wall.Length).Sum();
+                        //width = roof.Area / length;
                         azimuthRad = (float)(this.MajorWalls.First().Azimuth * (Math.PI / 180));
                         pitchRad = 0.0f;
                     }
-                    plane.Rotate(-1 * pitchRad, Vector3d.XAxis);
+                    plane.Rotate(pitchRad, Vector3d.XAxis);
                     plane.Rotate(azimuthRad, Vector3d.ZAxis);
-                    var cetroid2d = this.FindWallsCentroid();
-                    var roofHeight = this.MajorWalls.First().Height + Math.Sin(pitchRad) * width;
-                    plane.Translate(new Vector3d(cetroid2d.X, cetroid2d.Y, roofHeight));
+
+                    var firstPoint = wallsFacingSameDirection.First().RelativeEndPoint1;
+                    var secondPoint = wallsFacingSameDirection.Last().RelativeEndPoint2;
+                    var longestWall = wallsFacingSameDirection.OrderByDescending(w => w.Length).First();
+                    var firstEndPointForRoofLine = longestWall.GroundLine.Line.ClosestPoint(new Point3d(firstPoint.X, firstPoint.Y, 0), false);
+                    var secondEndPointForRoofLine = longestWall.GroundLine.Line.ClosestPoint(new Point3d(secondPoint.X, secondPoint.Y, 0), false);
+                    //var firstEndPointForRoofLine = longestWall.GroundLine.PointAt(t1);
+                    //longestWall.GroundLine.ClosestPoint(new Point3d(secondPoint.X, secondPoint.Y, 0), out double t2);
+                    //var secondEndPointForRoofLine = longestWall.GroundLine.PointAt(t2);
+                    var roofLine = new LineCurve(firstEndPointForRoofLine, secondEndPointForRoofLine);
+                    var roofLineMiddlePoint = roofLine.GetBoundingBox(true).Center;
+
+
+                    
+
+                    //var cetroid2d = this.FindWallsCentroid();
+                    var roofHeight = this.MajorWalls.First().Height; // + Math.Sin(pitchRad) * width;
+                    //plane.Translate(new Vector3d(cetroid2d.X, cetroid2d.Y, roofHeight));
+                    plane.Translate(new Vector3d(roofLineMiddlePoint.X, roofLineMiddlePoint.Y, roofHeight));
                     var xExtents = new Interval(0, width);
                     var yExtents = new Interval(length / 2 * -1, length / 2);
                     var newSurface = new PlaneSurface(plane, yExtents, xExtents);
