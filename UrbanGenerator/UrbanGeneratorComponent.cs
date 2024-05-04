@@ -25,8 +25,8 @@ namespace UrbanGenerator
         {
         }
 
-        private float DisplayGridDistance => 80.0f;
-        private int DisplayGridSizeX => 2;
+        private float DisplayGridDistance => 135.0f;
+        private int DisplayGridSizeX => 15;
         //private int DisplayGridSizeY => 3;
 
         /// <summary>
