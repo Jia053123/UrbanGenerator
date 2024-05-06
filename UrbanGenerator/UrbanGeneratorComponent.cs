@@ -43,6 +43,7 @@ namespace UrbanGenerator
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddCurveParameter("Footprint", "F", "Building Footprint", GH_ParamAccess.list);
+            pManager.AddBrepParameter("FirstFloors", "FF", "First Floors Visual", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Walls", "Wa", "Building Walls", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Windows", "Win", "Building Windows", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Overhangs", "Over", "Window Overhangs", GH_ParamAccess.list);
@@ -64,6 +65,7 @@ namespace UrbanGenerator
             var pathsToModels = modelDirs.Select(md => Directory.GetFiles(md, "*.xml")[0]);
 
             var listOfLines = new List<LineCurve>();
+            var listOfFirstFloors = new List<Brep>();
             var listOfWalls = new List<PlaneSurface>();
             var listOfWindows = new List<PlaneSurface>();
             var listOfOverhangs = new List<PlaneSurface>();
@@ -79,6 +81,7 @@ namespace UrbanGenerator
                 var building = new Building(modelParser, new PointF(x_loc * this.DisplayGridDistance, y_loc * this.DisplayGridDistance));
 
                 listOfLines.AddRange(building.MajorWalls.Select(w => w.GroundLine).ToList());
+                listOfFirstFloors.Add(building.FirstFloorSurface);
                 listOfWalls.AddRange(building.MajorWalls.Select(w => w.WallSurface).ToList());
                 listOfWindows.AddRange(building.Windows.Select(w => w.WindowSurface).ToList());
                 listOfOverhangs.AddRange(building.Windows.Select(w => w.Overhang.OverhangSurface).ToList());
@@ -93,11 +96,12 @@ namespace UrbanGenerator
             }
 
             DA.SetDataList(0, listOfLines);
-            DA.SetDataList(1, listOfWalls);
-            DA.SetDataList(2, listOfWindows);
-            DA.SetDataList(3, listOfOverhangs);
-            DA.SetDataList(4, listOfRoofs);
-            DA.SetData(5, listOfLines.Count.ToString());
+            DA.SetDataList(1, listOfFirstFloors);
+            DA.SetDataList(2, listOfWalls);
+            DA.SetDataList(3, listOfWindows);
+            DA.SetDataList(4, listOfOverhangs);
+            DA.SetDataList(5, listOfRoofs);
+            DA.SetData(6, listOfLines.Count.ToString());
         }
 
         /// <summary>

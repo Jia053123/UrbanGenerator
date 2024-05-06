@@ -28,6 +28,8 @@ namespace UrbanGenerator
         /// </summary>
         public List<Roof> Roofs { get; }
 
+        public Brep FirstFloorSurface { get; set; }
+
         public PointF CentroidLocation 
         {
             get => this._centriodLocation;
@@ -56,6 +58,8 @@ namespace UrbanGenerator
                     if (roof.RoofSurface is null) continue;
                     roof.RoofSurface.Translate(translation);
                 }
+
+                this.FirstFloorSurface.Translate(translation);
 
                 this._centriodLocation = value;
             } 
@@ -90,6 +94,8 @@ namespace UrbanGenerator
             {
                 this.Roofs = new List<Roof>();
             }
+
+            InitializeFirstFloor();
 
             this.CentroidLocation = centroidLocation;
         }
@@ -181,6 +187,10 @@ namespace UrbanGenerator
 
         private void InitializeRoofs()
         {
+            if (this.Roofs.Count > 4)
+            {
+                throw new Exception("roof count greater than 4");
+            }
             foreach (var roof in this.Roofs)
             {
                 float length;
@@ -227,6 +237,14 @@ namespace UrbanGenerator
 
                 roof.RoofSurface = newSurface;
             }
+        }
+
+        private void InitializeFirstFloor()
+        {
+            var endPoints = this.MajorWalls.Select(w => new Point3d(w.RelativeEndPoint1.X, w.RelativeEndPoint1.Y, 0)).ToList();
+            endPoints.Add(new Point3d(this.MajorWalls.First().RelativeEndPoint1.X, this.MajorWalls.First().RelativeEndPoint1.Y, 0));
+            var firstFloorCurve = new PolylineCurve(endPoints);
+            this.FirstFloorSurface = Brep.CreatePlanarBreps(firstFloorCurve, 0.001).First();
         }
 
         private PointF FindWallsCentroid()
