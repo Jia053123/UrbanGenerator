@@ -25,8 +25,8 @@ namespace UrbanGenerator
         {
         }
 
-        private float DisplayGridDistance => 135.0f;
-        private int DisplayGridSizeX => 15;
+        private float DisplayGridDistance => 120.0f;
+        private int DisplayGridSizeX => 25;
         //private int DisplayGridSizeY => 3;
 
         /// <summary>
@@ -62,7 +62,8 @@ namespace UrbanGenerator
             if (!DA.GetData(0, ref modelsDir)) return;
 
             var modelDirs = Directory.GetDirectories(modelsDir);
-            var pathsToModels = modelDirs.Select(md => Directory.GetFiles(md, "*.xml")[0]);
+            var pathsToModels = modelDirs.Select(md => Directory.GetFiles(md, "*.xml")[0]).ToList();
+            Utilities.Shuffle(pathsToModels);
 
             var listOfLines = new List<LineCurve>();
             var listOfFirstFloors = new List<Brep>();
@@ -102,6 +103,7 @@ namespace UrbanGenerator
             DA.SetDataList(4, listOfOverhangs);
             DA.SetDataList(5, listOfRoofs);
             DA.SetData(6, listOfLines.Count.ToString());
+
         }
 
         /// <summary>
